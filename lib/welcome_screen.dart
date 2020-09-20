@@ -4,7 +4,7 @@ import 'registration_screen.dart';
 import 'login_screen.dart';
 import 'foodmenu_page.dart';
 import 'reusable_elements/round_buttons.dart';
-import 'package:test_app_1/auh_screen.dart';
+import 'package:test_app_1/auth_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   static const id='welcome_screen';
