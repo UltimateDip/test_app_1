@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class Auth with ChangeNotifier {
-  String _token;
-  DateTime _expireTime;
-  String _userid;
+  
 
   Future<void> _authenticate(
       String email, String password, String urlPart) async {
