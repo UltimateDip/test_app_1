@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:test_app_1/auth.dart';
 import 'package:test_app_1/detailed_food_items.dart';
 import 'package:test_app_1/payment_page.dart';
 import 'package:test_app_1/welcome_screen.dart';
-
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class FoodMenuPage extends StatefulWidget {
   static const String id = 'food_menu_screen';
@@ -13,17 +15,24 @@ class FoodMenuPage extends StatefulWidget {
 }
 
 class _FoodMenuPageState extends State<FoodMenuPage> {
+  bool themeSwitch = false;
 
-  bool themeSwitch=false;
-  dynamic themeColors(){
-    if(themeSwitch){
-      return Color(0xff1dd3bd) ;
-    }
-    else
+  dynamic themeColors() {
+    if (themeSwitch) {
+      return Color(0xff1dd3bd);
+    } else
       return Color(0xff202040);
   }
+
   bool value = true;
   int totalItemsInCart = 0;
+
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) => getFoodData());
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,22 +57,25 @@ class _FoodMenuPageState extends State<FoodMenuPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       IconButton(
-                        icon: themeSwitch?
-                        Icon(Icons.brightness_3,color: Colors.white,)
-                            :
-                        Icon(Icons.wb_sunny,color: Colors.white,)
-                        ,
+                        icon: themeSwitch
+                            ? Icon(
+                          Icons.brightness_3,
+                          color: Colors.white,
+                        )
+                            : Icon(
+                          Icons.wb_sunny,
+                          color: Colors.white,
+                        ),
                         onPressed: () {
                           setState(() {
-                            themeSwitch =!themeSwitch;
+                            themeSwitch = !themeSwitch;
                           });
                         },
                       ),
                       IconButton(
                         icon: Icon(Icons.menu),
                         color: Colors.white,
-                        onPressed: () {
-                        },
+                        onPressed: () {},
                       ),
                     ],
                   ),
@@ -167,8 +179,8 @@ class _FoodMenuPageState extends State<FoodMenuPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: (){
-                          if(totalItemsInCart>0){
+                        onTap: () {
+                          if (totalItemsInCart > 0) {
                             setState(() {
                               totalItemsInCart--;
                             });
@@ -203,9 +215,10 @@ class _FoodMenuPageState extends State<FoodMenuPage> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: (){
-                          Navigator.of(context).push(MaterialPageRoute(
-                              builder:(context)=> PaymentPage(),
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => PaymentPage(),
                             ),
                           );
                         },
@@ -238,12 +251,25 @@ class _FoodMenuPageState extends State<FoodMenuPage> {
 
   Widget _buildFoodItem(
       BuildContext context, String imgPath, String foodName, String foodPrice) {
+    const url = 'https://testproject-ca980.firebaseio.com/Foods.json';
+
+    http.post(
+      url,
+      body: json.encode({
+        'Food Image': imgPath,
+        'Food Name': foodName,
+        'Food Price': foodPrice,
+      }),
+    );
+
+
     return Padding(
       padding: EdgeInsets.only(left: 10, right: 10, top: 10),
       child: InkWell(
         onTap: () {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) => DetailedFoodItem(
+              builder: (context) =>
+                  DetailedFoodItem(
                     heroTag: imgPath,
                     foodName: foodName,
                     foodPrice: foodPrice,
@@ -307,7 +333,6 @@ class _FoodMenuPageState extends State<FoodMenuPage> {
 //Search bar for foods
 
 Widget _searchFoodScreen(BuildContext context) {
-
   return Container(
     decoration: BoxDecoration(
       color: Color(0xff757575),
@@ -324,7 +349,6 @@ Widget _searchFoodScreen(BuildContext context) {
           Padding(
             padding: const EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
             child: TextField(
-
               style: TextStyle(
                 color: Color(0xff000000),
               ),
@@ -371,3 +395,15 @@ Widget _searchFoodScreen(BuildContext context) {
 }
 
 
+final String authToken = Auth().token;
+
+Future<void> getFoodData() async {
+  final url = 'https://testproject-ca980.firebaseio.com/Foods.json?auth=$authToken';
+
+  try {
+    final response = await http.get(url);
+    print(json.decode(response.body));
+  } catch (error) {
+    throw (error);
+  }
+}
