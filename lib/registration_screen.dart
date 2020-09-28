@@ -203,6 +203,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                           ),
 
                           obscureText: true,
+
+                          //TODO
                           // controller: TextEditingController(),
 
                           // ignore: missing_return
@@ -222,6 +224,8 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                         onClick: () {
                           print(email);
                           print(password);
+
+                          //TODO
                           // await Provider.of<Auth>(context, listen: false)
                           //     .signUp(email, password);
 
